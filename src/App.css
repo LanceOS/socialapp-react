@@ -1,0 +1,10 @@
+@tailwind;
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  padding: 0;
+}
