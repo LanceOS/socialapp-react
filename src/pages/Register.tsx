@@ -32,7 +32,7 @@ const Register = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col gap-8 px-6 py-6 justify-center items-center">
+    <main className="min-h-screen mx-auto flex flex-col gap-8 px-6 py-6 justify-center items-center">
       <h1 className="text-2xl sm:text-4xl font-bold">Created New Account</h1>
       <form
         className="bg-white w-full sm:w-xl flex flex-col gap-12 items-center px-8 py-16 rounded-lg"

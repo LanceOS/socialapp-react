@@ -1,5 +1,4 @@
-@tailwind utilities;
-@tailwind;
+@import "tailwindcss";
 
 @theme {
   --color-base-100: oklch(98% 0 0);

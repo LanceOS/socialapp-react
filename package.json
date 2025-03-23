@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "pb": "./pocketbase/pocketbase serve --http=127.0.0.0:8090"
+    "pb": "./pocketbase/pocketbase serve --http=127.0.0.1:8090"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.15",

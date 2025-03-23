@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from "react";
 import Pocketbase, { RecordModel } from "pocketbase";
 import UserContext from "../contexts/UserContext";
+import { useNavigate } from "react-router-dom";
+import PBClient from "../classes/Pocketbase";
 
-const pb = new Pocketbase("http://127.0.0.0:8090");
+const pb = PBClient.pb;
 
 interface IRegister {
   username: string;
@@ -12,14 +14,21 @@ interface IRegister {
   passwordConfirm: string;
 }
 
+interface ISignin {
+  email: string;
+  password: string;
+}
+
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState<RecordModel | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const currentUser = await pb.authStore.model;
+        const currentUser = pb.authStore.record;
         if (currentUser) {
           setUser(currentUser);
         }
@@ -34,37 +43,34 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   const createUser = async (data: IRegister) => {
-    console.log(data);
     await pb
       .collection("users")
       .create(data)
-      .then(() => (window.location.href = "/signin"))
+      .then(() => {
+        navigate("/signin");
+      })
       .catch((err) => {
         console.error(err);
-        throw new Error(err);
       });
   };
 
-  const login = async (email: string, password: string) => {
-    try {
-      const authData = await pb
-        .collection("users")
-        .authWithPassword(email, password);
-      setUser(authData.record);
-    } catch (error) {
-      console.error("Login error:", error);
-      throw error;
-    }
+  const login = async (data: ISignin) => {
+    await pb
+      .collection("users")
+      .authWithPassword(data.email, data.password)
+      .then((authData) => {
+        setUser(authData.record);
+        navigate("/");
+        return authData.record;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   const logout = async () => {
-    try {
-      await pb.authStore.clear();
-      setUser(null);
-    } catch (error) {
-      console.error("Logout error:", error);
-      throw error;
-    }
+    await pb.authStore.clear();
+    setUser(null);
   };
 
   return (

@@ -1,14 +1,18 @@
 import React from "react";
 import { useState } from "react";
+import Posts from "../lib/classes/Posts";
+import { RecordModel } from "pocketbase";
 
-const CreatePost = () => {
+const CreatePost = ({ user }: RecordModel) => {
   // list of uploaded images from input
   const [uploadedImages, setUploadedImages] = useState<object[]>([]);
 
   // processed image
   const [renderedImages, setRenderedImages] = useState<string[]>([]);
 
-  function handleFileUpload(event: Event) {
+  function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    console.log("This function has been called:", event.target);
+
     const target = event.target as HTMLInputElement;
     if (target.files) {
       const newFiles = Array.from(target.files);
@@ -16,7 +20,7 @@ const CreatePost = () => {
       console.log(newFiles);
 
       // convert FileList to an array and merge with current state
-      setUploadedImages([...uploadedImages, ...newFiles]);
+      setUploadedImages((prevImages) => [...prevImages, ...newFiles]);
 
       // process each new file
       newFiles.forEach(processFile);
@@ -45,28 +49,17 @@ const CreatePost = () => {
 
   const [counter, setCounter] = useState(false);
 
-  async function submitNewPost(event: any) {
+  async function submitNewPost(event: React.FormEvent) {
     event.preventDefault();
 
-    const formData = new FormData();
-    formData.append("body", bodyText);
+    if (!bodyText && uploadedImages.length === 0) return;
+    if (!user) return;
 
-    uploadedImages.forEach((image): any => {
-      formData.append(`images`, image);
+    await Posts.createPost(bodyText, uploadedImages, user).then(() => {
+      setBodyText("");
+      setUploadedImages([]);
+      setRenderedImages([]);
     });
-
-    await axios
-      .post("/api/posts", formData, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.log(err.response.data);
-      });
   }
 
   return (
@@ -83,7 +76,7 @@ const CreatePost = () => {
             onChange={(e) => setBodyText(e.target.value)}
             onFocusCapture={() => setCounter(!counter)}
           ></textarea>
-          {counter && (
+          {bodyText && (
             <p
               className={`absolute py-2 px-4 self-end ${
                 bodyText.length < 400 ? "text-info" : "text-error"
@@ -97,7 +90,7 @@ const CreatePost = () => {
         {renderedImages && (
           <div className="flex flex-row gap-4 overflow-y-none overflow-x-auto">
             {renderedImages.map((image, index) => (
-              <div className="relative flex-none">
+              <div className="relative flex-none" key={index}>
                 <button
                   type="button"
                   aria-label="Remove image from post"
@@ -127,7 +120,7 @@ const CreatePost = () => {
             accept="image/*"
             aria-label="Upload a selected image (Optional)"
             className="p-2 bg-base-300 rounded-lg cursor-pointer hidden"
-            onChange={() => handleFileUpload}
+            onChange={handleFileUpload}
           />
           <button
             type="button"
