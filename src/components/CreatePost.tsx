@@ -79,6 +79,7 @@ const CreatePost = () => {
             className={`w-full h-10 focus:outline-0 focus:h-52 ${
               bodyText.length > 0 && "h-52"
             }  transition-all duration-150 leading-normal bg-base-300 rounded-lg py-2 px-6 resize-none overflow-hidden`}
+            value={bodyText}
             onChange={(e) => setBodyText(e.target.value)}
             onFocusCapture={() => setCounter(!counter)}
           ></textarea>
@@ -149,7 +150,7 @@ const CreatePost = () => {
                 rx="2"
                 ry="2"
                 stroke="white"
-                stroke-width="1"
+                strokeWidth="1"
                 fill="none"
               />
               <circle
@@ -157,13 +158,13 @@ const CreatePost = () => {
                 cy="13"
                 r="4"
                 stroke="white"
-                stroke-width="1"
+                strokeWidth="1"
                 fill="none"
               />
               <path
                 d="M8 7L10 4H14L16 7"
                 stroke="white"
-                stroke-width="1"
+                strokeWidth="1"
                 fill="none"
               />
             </svg>
